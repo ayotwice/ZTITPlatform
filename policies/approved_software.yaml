@@ -1,0 +1,111 @@
+# Approved Software Allowlist
+#
+# Software packages approved for installation on company devices.
+# Managed via GitOps - changes require PR approval.
+
+version: "1.0"
+last_updated: "2025-01-01"
+approved_by: "IT Security"
+
+# Categories of approved software
+categories:
+  # Required Security Tools - MUST be installed
+  security:
+    required: true
+    packages:
+      - name: "CrowdStrike Falcon"
+        versions: ["*"]
+        notes: "EDR agent - mandatory"
+
+      - name: "Kandji Agent"
+        versions: ["*"]
+        aliases: ["Iru Agent"]
+        notes: "MDM agent - mandatory"
+
+      - name: "1Password"
+        versions: ["*"]
+        notes: "Password management"
+
+  # Productivity Suite
+  productivity:
+    required: false
+    packages:
+      - name: "Google Chrome"
+        versions: ["*"]
+        notes: "Primary browser"
+
+      - name: "Firefox"
+        versions: ["*"]
+        notes: "Alternative browser"
+
+      - name: "Slack"
+        versions: ["*"]
+        notes: "Company communication"
+
+      - name: "Zoom"
+        versions: ["*"]
+        notes: "Video conferencing"
+
+      - name: "Notion"
+        versions: ["*"]
+        notes: "Documentation"
+
+      - name: "Microsoft Office"
+        versions: ["*"]
+        notes: "Office suite"
+
+  # Development Tools
+  development:
+    required: false
+    department_restricted: ["Engineering", "Product"]
+    packages:
+      - name: "Visual Studio Code"
+        versions: ["*"]
+
+      - name: "iTerm2"
+        versions: ["*"]
+
+      - name: "Docker"
+        versions: ["*"]
+        notes: "Containerization"
+
+      - name: "Homebrew"
+        versions: ["*"]
+        notes: "Package manager"
+
+      - name: "Git"
+        versions: ["*"]
+
+      - name: "GitHub Desktop"
+        versions: ["*"]
+
+# Blocked Packages - Known malicious or policy violations
+blocked:
+  - name: "compromised-package"
+    reason: "Known supply chain attack vector (Shai-Hulud)"
+    blocked_date: "2024-12-01"
+
+  - name: "torrent-client"
+    reason: "Policy violation - P2P sharing"
+
+  - name: "remote-desktop-xyz"
+    reason: "Unapproved remote access tool"
+
+# Approval Process
+approval_workflow:
+  # How to request new software
+  request_channel: "#it-requests"
+
+  # Who can approve
+  approvers:
+    - "IT Security Team"
+    - "IT Manager"
+
+  # Required information
+  required_fields:
+    - business_justification
+    - security_review_completed
+    - license_confirmed
+
+  # SLA for approval decisions
+  response_sla_hours: 48

@@ -1,0 +1,72 @@
+# GitHub Actions Workflow: Terraform Apply on Merge
+#
+# Applies Terraform changes when PRs are merged to main.
+# This completes the GitOps workflow - PR = review, merge = deploy.
+
+name: Terraform Apply on Merge
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "terraform/**"
+
+permissions:
+  contents: read
+
+env:
+  TF_LOG: INFO
+
+jobs:
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    environment: production
+
+    strategy:
+      matrix:
+        directory:
+          - terraform/okta
+          - terraform/google
+      # Apply one at a time to avoid conflicts
+      max-parallel: 1
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ${{ matrix.directory }}
+        env:
+          TF_VAR_okta_api_token: ${{ secrets.OKTA_API_TOKEN }}
+          TF_VAR_google_credentials: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: ${{ matrix.directory }}
+        env:
+          TF_VAR_okta_api_token: ${{ secrets.OKTA_API_TOKEN }}
+          TF_VAR_google_credentials: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      - name: Notify on Success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('Terraform apply successful for ${{ matrix.directory }}');
+            // In production: Send Slack notification
+
+      - name: Notify on Failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('Terraform apply FAILED for ${{ matrix.directory }}');
+            // In production: Send PagerDuty alert

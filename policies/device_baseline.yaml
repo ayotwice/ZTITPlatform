@@ -1,0 +1,69 @@
+# macOS Device Security Baseline
+#
+# Declarative policy defining required security settings for macOS devices.
+# Used by policy engine to validate device compliance.
+
+version: "1.0"
+platform: macos
+minimum_os_version: "14.0.0"
+
+security_controls:
+  # Disk Encryption
+  disk_encryption:
+    required: true
+    type: filevault
+    key_escrow: true
+
+  # Screen Lock
+  screen_lock:
+    required: true
+    max_idle_time_seconds: 300 # 5 minutes
+    require_password: true
+
+  # System Integrity
+  sip_enabled: true # System Integrity Protection
+  gatekeeper_enabled: true # App verification
+  secure_boot: true # T2/Apple Silicon secure boot
+
+  # Firewall
+  firewall:
+    enabled: true
+    stealth_mode: true
+    block_all_incoming: false # Allow signed apps
+
+  # Remote Access
+  remote_login:
+    ssh_enabled: false
+    screen_sharing_enabled: false
+
+  # Automatic Updates
+  automatic_updates:
+    enabled: true
+    check_frequency_days: 1
+    install_critical_updates: true
+
+patch_requirements:
+  # This implements John's "2-week SLA" requirement
+  max_days_since_patch: 14
+  critical_patch_sla_hours: 72
+
+compliance_thresholds:
+  minimum_posture_score: 60
+  warning_posture_score: 75
+
+mdm_requirements:
+  enrolled: true
+  check_in_frequency_hours: 4
+  approved_providers:
+    - kandji
+    - jamf
+    - iru
+
+edr_requirements:
+  installed: true
+  active: true
+  approved_providers:
+    - crowdstrike
+    - sentinelone
+  # Block access if active threats detected
+  block_on_active_threat: true

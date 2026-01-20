@@ -1,0 +1,19 @@
+# requirements.txt
+# Python dependencies for Zero Trust IT Platform
+
+# Core
+dataclasses-json>=0.5.7
+
+# API Clients (for production use)
+# httpx>=0.24.0
+# requests>=2.28.0
+
+# Testing
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# Type checking
+mypy>=1.0.0
+
+# Linting
+ruff>=0.1.0
